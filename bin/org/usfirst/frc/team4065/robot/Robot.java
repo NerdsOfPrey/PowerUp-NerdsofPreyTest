@@ -146,7 +146,7 @@ int Target = 0;
 	 * This function is called periodically during autonomous.
 	 */
 	@Override
-	public void autonomousPeriodic() {
+	public void autonomousPeriodic() {//TODO: move each case code to a seperate function in TalonAutoDrive class
 
 	//	String gameData;
 
