@@ -8,23 +8,24 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 
 public class TalonAutoDrive {
-	//DRIVE	
-	private TalonSRX _TopL = new TalonSRX(3);
-	private TalonSRX _BtmL = new TalonSRX(2);
-	private TalonSRX _TopR = new TalonSRX(13);
-	private TalonSRX _BtmR = new TalonSRX(12);
-	private TalonSRX lift = new TalonSRX(32);
+	//DRIVE
+	// You do not need to redefine the talonsrx here, your constructor will set the values when you create the object
+	private TalonSRX _TopL;
+	private TalonSRX _BtmL;
+	private TalonSRX _TopR;
+	private TalonSRX _BtmR;
+	private TalonSRX lift;
 
-	private TalonSRX intakeL  = new TalonSRX(22);
-	private TalonSRX intakeR  = new TalonSRX(23);
-			
-		
-	private DoubleSolenoid Solenoid = new DoubleSolenoid(4,5);
-	
+	private TalonSRX intakeL;
+	private TalonSRX intakeR;
+
+
+	private DoubleSolenoid Solenoid;
+
 
 	public TalonAutoDrive(TalonSRX _TopL, TalonSRX _BtmL, TalonSRX _TopR, TalonSRX _BtmR, TalonSRX intakeL, TalonSRX intakeR) {
 
-		
+
 		this._TopL = _TopL;
 
 		this._BtmL = _BtmL;
@@ -32,15 +33,19 @@ public class TalonAutoDrive {
 		this._TopR = _TopR;
 
 		this._BtmR = _BtmR;
+		// You also need to set the intake variables too.
+		this.intakeL = intakeL;
+
+		this.intakeR = intakeR;
 
 		_BtmL.set(ControlMode.Follower, _TopL.getDeviceID());
 
 		_BtmR.set(ControlMode.Follower, _TopR.getDeviceID());
-	
+
 
 	}
 
-	
+
 
 	public void drive(double speed) {
 
@@ -70,19 +75,19 @@ public class TalonAutoDrive {
 	}
 	public void closeSolenoid(boolean close)
 		{
-		
+
 		Solenoid.set(DoubleSolenoid.Value.kForward);
-	
-		
+
+
 	}
 	public void openSolenoid(boolean open)
 	{
 		Solenoid.set(DoubleSolenoid.Value.kReverse);
-		
+
 	}
 	public void offSolenoid(boolean off)
 	{
 		Solenoid.set(DoubleSolenoid.Value.kOff);
 	}
-	
+
 }

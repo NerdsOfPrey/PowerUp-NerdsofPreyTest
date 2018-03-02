@@ -42,15 +42,15 @@ import com.ctre.phoenix.motorcontrol.can.*;
 import com.mindsensors.CANLight;
 public class Robot extends IterativeRobot {
 
-public TalonAutoDrive driveAuto;
-	
+//create driveAuto object after you declare talonSrx objects and plug them into the contructor in the order you specified.
+
 boolean toggleState = false;
 
 
 //JOYSTICK
 private Joystick _joystick = new Joystick(0);
-	
-//DRIVE	
+
+//DRIVE
 private TalonSRX _TopL = new TalonSRX(3);
 private TalonSRX _BtmL = new TalonSRX(2);
 private TalonSRX _TopR = new TalonSRX(13);
@@ -59,7 +59,10 @@ private TalonSRX lift = new TalonSRX(32);
 
 private TalonSRX intakeL  = new TalonSRX(22);
 private TalonSRX intakeR  = new TalonSRX(23);
-	
+
+//now your driveAuto should work
+public TalonAutoDrive driveAuto = new TalonAutoDrive(_TopL, _BtmL, _TopR, _BtmR, intakeL, intakeR);
+
 private DoubleSolenoid solenoid = new DoubleSolenoid(4,5);
 
 // L E D  L I G H T S
@@ -69,7 +72,7 @@ private AHRS mNavX;
 
 double leftStickValue;
 double rightStickValue;
-	
+
 int timer = 0;
 
 private Compressor compressor = new Compressor();
@@ -92,10 +95,10 @@ int STAHP = 0;
 int Target = 0;
 
 //==========================================================
-	
+
 	@Override
 	public void robotInit() {
-		
+
 		_TopL.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
 
 		_TopR.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
@@ -103,18 +106,18 @@ int Target = 0;
 		CameraServer server = CameraServer.getInstance();
 
 		server.startAutomaticCapture("cam0", 0);
-		
+
 	//mNavX = new AHRS();
-		
+
 	_BtmL.follow(_TopL);
 	_BtmR.follow(_TopR);
-		
+
 	leftStickValue = 0.0;
 	rightStickValue = 0.0;
-		
+
 	compressor.start();
-	compressor.setClosedLoopControl(true);   
-	
+	compressor.setClosedLoopControl(true);
+
 	chooser.addDefault("Baseline", baseline);
 
 	chooser.addObject("Center Auto", centerAuto);
@@ -128,10 +131,10 @@ int Target = 0;
 	//lights = new CANLight(1);
 	//lights.showRGB(0, 255, 0);
 
-	}		
+	}
 //===========================================================
-	
-	
+
+
 	@Override
 	public void autonomousInit() {
 		autoSelected = chooser.getSelected();
@@ -144,54 +147,54 @@ int Target = 0;
 	 */
 	@Override
 	public void autonomousPeriodic() {
-		
+
 	//	String gameData;
-		
+
 		//gameData = DriverStation.getInstance().getGameSpecificMessage();
-	/*	
+	/*
 		switch (autoSelected) {
 
 		case leftAuto:
 
 	        if(gameData.length() > 0)
 
-	                { 
+	                {
 
 			  if(gameData.charAt(0) == 'L')
 			  {
 				  	driveAuto.drive(0.3);//drives straight
 				  	Timer.delay(7);
-				  	driveAuto.drive(0.0);//stop drive				  	
-				  	driveAuto.closeSolenoid(true);//clamp the cube			  	
-				  	Timer.delay(0.3);			  	
-				  	driveAuto.intake(0.3);//suck the cube				  	
-				  	Timer.delay(1);			  	
-				  	driveAuto.intake(0.0);//stops sucking the cube			  	
-				  	driveAuto.closeSolenoid(false);//turn off air				  	
-				  	driveAuto.offSolenoid(true);//make sure air is off				  	
-				  	driveAuto.turnR(0.3);//turns right				  	
-				  	Timer.delay(1);				  	
-				  	driveAuto.turnR(0.0);//stops turning			  	
+				  	driveAuto.drive(0.0);//stop drive
+				  	driveAuto.closeSolenoid(true);//clamp the cube
+				  	Timer.delay(0.3);
+				  	driveAuto.intake(0.3);//suck the cube
+				  	Timer.delay(1);
+				  	driveAuto.intake(0.0);//stops sucking the cube
+				  	driveAuto.closeSolenoid(false);//turn off air
+				  	driveAuto.offSolenoid(true);//make sure air is off
+				  	driveAuto.turnR(0.3);//turns right
+				  	Timer.delay(1);
+				  	driveAuto.turnR(0.0);//stops turning
 				  	driveAuto.lift(0.4);//arm moves up
 				  	Timer.delay(2);
 				  	driveAuto.lift(0.0);//stops lift
 				  	Timer.delay(0.1);
-				  	driveAuto.drive(0.2);//DRIVE TO THE scale a little 
+				  	driveAuto.drive(0.2);//DRIVE TO THE scale a little
 				  	Timer.delay(2);
 				  	driveAuto.intake(-0.9);//spit out the cube
 				  	Timer.delay(2);
-				  	driveAuto.intake(0.0);//stops the intake motors				  	
+				  	driveAuto.intake(0.0);//stops the intake motors
 				  	driveAuto.drive(-0.3);//drive backwards to be ready for the match
 
-			  } else if(gameData.charAt(0) == 'R') { // right  
-				 
+			  } else if(gameData.charAt(0) == 'R') { // right
+
 				  driveAuto.drive(0.5);
 				  Timer.delay(7);
 				  driveAuto.drive(0.0);
 			  }
 				break;
 }
-			case centerAuto: 
+			case centerAuto:
 
 				  if(gameData.length() > 0)
 	             {
@@ -215,27 +218,27 @@ int Target = 0;
 					Timer.delay(1);
 					driveAuto.closeSolenoid(true);//clamp the cube
 					Timer.delay(0.3);
-				  	driveAuto.intake(0.3);//suck the cube				  	
-				  	Timer.delay(1);				  	
+				  	driveAuto.intake(0.3);//suck the cube
+				  	Timer.delay(1);
 				  	driveAuto.intake(0.0);//stops sucking the cube
-				  	driveAuto.closeSolenoid(false);//turn off air				  	
-				  	driveAuto.offSolenoid(true);//make sure air is off			  	
-				  	driveAuto.turnR(0.3);//turns right			  	
-				  	Timer.delay(1);				  	
+				  	driveAuto.closeSolenoid(false);//turn off air
+				  	driveAuto.offSolenoid(true);//make sure air is off
+				  	driveAuto.turnR(0.3);//turns right
+				  	Timer.delay(1);
 					driveAuto.lift(0.4);//arm moves up
 				  	Timer.delay(2);
 				  	driveAuto.lift(0.0);//stops lift
 				  	Timer.delay(0.1);
-				  	driveAuto.drive(0.2);//DRIVE TO THE scale a little 
+				  	driveAuto.drive(0.2);//DRIVE TO THE scale a little
 				  	Timer.delay(2);
 				  	driveAuto.intake(-0.9);//spit out the cube
 				  	Timer.delay(2);
 				  	driveAuto.intake(0.0);//stops the intake motors
-				  	
+
 				  	driveAuto.drive(-0.3);//drive backwards to be ready for the match
 
 			 } else if(gameData.charAt(0) == 'R') {
-				
+
 				 driveAuto.drive(0.3);//drive
 					Timer.delay(2);
 					driveAuto.drive(0.0);//stop drive
@@ -254,18 +257,18 @@ int Target = 0;
 					Timer.delay(1);
 					driveAuto.closeSolenoid(true);//clamp the cube
 					Timer.delay(0.3);
-				  	driveAuto.intake(0.3);//suck the cube				  	
-				  	Timer.delay(1);				  	
+				  	driveAuto.intake(0.3);//suck the cube
+				  	Timer.delay(1);
 				  	driveAuto.intake(0.0);//stops sucking the cube
-				  	driveAuto.closeSolenoid(false);//turn off air				  	
-				  	driveAuto.offSolenoid(true);//make sure air is off			  	
-				  	driveAuto.turnL(0.3);//turns left			  	
-				  	Timer.delay(1);				  	
+				  	driveAuto.closeSolenoid(false);//turn off air
+				  	driveAuto.offSolenoid(true);//make sure air is off
+				  	driveAuto.turnL(0.3);//turns left
+				  	Timer.delay(1);
 					driveAuto.lift(0.4);//arm moves up
 				  	Timer.delay(2);
 				  	driveAuto.lift(0.0);//stops lift
 				  	Timer.delay(0.1);
-				  	driveAuto.drive(0.2);//DRIVE TO THE scale a little 
+				  	driveAuto.drive(0.2);//DRIVE TO THE scale a little
 				  	Timer.delay(2);
 				  	driveAuto.intake(-0.9);//spit out the cube
 				  	Timer.delay(2);
@@ -274,9 +277,9 @@ int Target = 0;
 					}
 				break;
 	              }
-			case rightAuto: 
+			case rightAuto:
 				   if(gameData.length() > 0)
-	               {   
+	               {
 					   if(gameData.charAt(0) == 'L')
 			  {
 				   	driveAuto.drive(0.5);
@@ -340,7 +343,7 @@ int Target = 0;
 
 		//double y = ty.getDouble(0);
 
-	//	double area = ta.getDouble(0);  
+	//	double area = ta.getDouble(0);
 
 //		System.out.println("teleop");
 
@@ -350,7 +353,7 @@ int Target = 0;
 
 	//		System.out.println("Entering Target Chase");
 
-	//		Target = 1;		
+	//		Target = 1;
 
 	//	}
 
@@ -400,19 +403,19 @@ int Target = 0;
 
 		//	}
 
-	//	}			
+	//	}
 //===========================================================================
 //J O Y S T I C K
 
  leftStickValue = _joystick.getRawAxis(2);
  rightStickValue = _joystick.getRawAxis(3);
-	 
- if(Math.abs(leftStickValue) > 0.1 || Math.abs(rightStickValue) > 0.1) 
+
+ if(Math.abs(leftStickValue) > 0.1 || Math.abs(rightStickValue) > 0.1)
  {
 	 double right = rightStickValue * rightStickValue;
 	 double left = leftStickValue * leftStickValue;
-		 
-	 if(rightStickValue > 0) 
+
+	 if(rightStickValue > 0)
 	 {
 		 right *= -1;
 	 }
@@ -420,10 +423,10 @@ int Target = 0;
 	 {
 		 left *= -1;
 	 }
-		 
+
 		 _TopL.set(ControlMode.PercentOutput, left);
 		_TopR.set(ControlMode.PercentOutput, right);
-			
+
 
 	}else{
 		_TopL.set(ControlMode.PercentOutput, 0);
@@ -431,8 +434,8 @@ int Target = 0;
 }
 
 //===========================================================================
-// L I F T 
- if(_joystick.getRawButton(1))// && !limitSwitch.get()) 
+// L I F T
+ if(_joystick.getRawButton(1))// && !limitSwitch.get())
  {
 	 lift.set(ControlMode.PercentOutput, 0.7);
 }else if(_joystick.getRawButton(4))//&& limitSwitch.get())
@@ -441,7 +444,7 @@ int Target = 0;
 
  }else {
 	 lift.set(ControlMode.PercentOutput, 0);
-			
+
 }
  //=====================================================================
 //I N T A K E  M O T O R S
@@ -458,15 +461,15 @@ int Target = 0;
 }
 //========================================================================
  // I N T A K E   G R A B B E R
- 
+
  if(_joystick.getRawButton(5))
-	 
+
  {
 	 solenoid.set(DoubleSolenoid.Value.kForward);
  }else if(_joystick.getRawButton(6))
  {
 	 solenoid.set(DoubleSolenoid.Value.kReverse);
-	 
+
  }else{
 	 solenoid.set(DoubleSolenoid.Value.kOff);
  }
