@@ -85,6 +85,8 @@ final String rightAuto = "Right Auto";
 
 final String centerAuto = "Center Auto";
 
+final double driveWheelCircumference = 6 * Math.PI;//6 is the diameter of the drivetrain wheel in inches
+
 String autoSelected;
 
 SendableChooser<String> chooser = new SendableChooser<>();
@@ -99,15 +101,15 @@ int Target = 0;
 	@Override
 	public void robotInit() {
 
-		_TopL.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
+	_TopL.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
+	//you would need to invert one of these since one of them will give negative distances because it is rotating opposite of the other one.
+	_TopR.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
 
-		_TopR.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
+	CameraServer server = CameraServer.getInstance();
 
-		CameraServer server = CameraServer.getInstance();
+	server.startAutomaticCapture("cam0", 0);
 
-		server.startAutomaticCapture("cam0", 0);
-
-	//mNavX = new AHRS();
+	mNavX = new AHRS(SPI.Port.kMXP);//spi port is the port when mounting the board directly on roborio, in the middle
 
 	_BtmL.follow(_TopL);
 	_BtmR.follow(_TopR);
@@ -134,6 +136,14 @@ int Target = 0;
 	}
 //===========================================================
 
+	/**
+		This function converts the position read by mag encoder on the talon given in the argument into inches traveled.
+		You have the mag encoders set to relative, so whatever the starting position when the robot starts of the encoder is 0
+	*/
+	public double getEncoderDistanceInches(TalonSRX* tal)
+	{
+			return ( driveWheelCircumference * tal.getSelectedSensorPosition(0) ) / 4096;//driveWheelCircumference is defined above, make sure to fix it if its wrong.
+	}
 
 	@Override
 	public void autonomousInit() {
@@ -146,52 +156,53 @@ int Target = 0;
 	 * This function is called periodically during autonomous.
 	 */
 	@Override
-	public void autonomousPeriodic() {//TODO: move each case code to a seperate function in TalonAutoDrive class
+	public void autonomousPeriodic() {
 
-	//	String gameData;
+	  String gameData;
 
-		//gameData = DriverStation.getInstance().getGameSpecificMessage();
-	/*
+	  gameData = DriverStation.getInstance().getGameSpecificMessage();//gets position of our alliance colors on switches and scale
+		//it contains 3 letters, each letter is either L for our color being on the left side when facing it or R if it will be on the right side when facing from DS side.
+		//we want only the switch color for our switch right in front of us for auto, so we need the first letter.
+
 		switch (autoSelected) {
 
 		case leftAuto:
 
 	        if(gameData.length() > 0)
+					{
 
-	                {
+			  		if(gameData.charAt(0) == 'L')
+			  		{
+				  			driveAuto.drive(0.3);//drives straight
+				  			Timer.delay(7);
+						  	driveAuto.drive(0.0);//stop drive
+						  	driveAuto.closeSolenoid(true);//clamp the cube
+						  	Timer.delay(0.3);
+						  	driveAuto.intake(0.3);//suck the cube
+						  	Timer.delay(1);
+						  	driveAuto.intake(0.0);//stops sucking the cube
+						  	driveAuto.closeSolenoid(false);//turn off air
+						  	driveAuto.offSolenoid(true);//make sure air is off
+						  	driveAuto.turnR(0.3);//turns right
+						  	Timer.delay(1);
+						  	driveAuto.turnR(0.0);//stops turning
+						  	driveAuto.lift(0.4);//arm moves up
+						  	Timer.delay(2);
+						  	driveAuto.lift(0.0);//stops lift
+						  	Timer.delay(0.1);
+						  	driveAuto.drive(0.2);//DRIVE TO THE scale a little
+						  	Timer.delay(2);
+						  	driveAuto.intake(-0.9);//spit out the cube
+						  	Timer.delay(2);
+						  	driveAuto.intake(0.0);//stops the intake motors
+						  	driveAuto.drive(-0.3);//drive backwards to be ready for the match
+			  		}
+						else if(gameData.charAt(0) == 'R') { // right
 
-			  if(gameData.charAt(0) == 'L')
-			  {
-				  	driveAuto.drive(0.3);//drives straight
-				  	Timer.delay(7);
-				  	driveAuto.drive(0.0);//stop drive
-				  	driveAuto.closeSolenoid(true);//clamp the cube
-				  	Timer.delay(0.3);
-				  	driveAuto.intake(0.3);//suck the cube
-				  	Timer.delay(1);
-				  	driveAuto.intake(0.0);//stops sucking the cube
-				  	driveAuto.closeSolenoid(false);//turn off air
-				  	driveAuto.offSolenoid(true);//make sure air is off
-				  	driveAuto.turnR(0.3);//turns right
-				  	Timer.delay(1);
-				  	driveAuto.turnR(0.0);//stops turning
-				  	driveAuto.lift(0.4);//arm moves up
-				  	Timer.delay(2);
-				  	driveAuto.lift(0.0);//stops lift
-				  	Timer.delay(0.1);
-				  	driveAuto.drive(0.2);//DRIVE TO THE scale a little
-				  	Timer.delay(2);
-				  	driveAuto.intake(-0.9);//spit out the cube
-				  	Timer.delay(2);
-				  	driveAuto.intake(0.0);//stops the intake motors
-				  	driveAuto.drive(-0.3);//drive backwards to be ready for the match
-
-			  } else if(gameData.charAt(0) == 'R') { // right
-
-				  driveAuto.drive(0.5);
-				  Timer.delay(7);
-				  driveAuto.drive(0.0);
-			  }
+				  		driveAuto.drive(0.5);
+				  		Timer.delay(7);
+				  		driveAuto.drive(0.0);
+			  	}
 				break;
 }
 			case centerAuto:
@@ -320,7 +331,7 @@ int Target = 0;
 				driveAuto.drive(0.0);
 				break;
 	              }
-	              */
+
 	}
 	/**
 	 * This function is called periodically during operator control.

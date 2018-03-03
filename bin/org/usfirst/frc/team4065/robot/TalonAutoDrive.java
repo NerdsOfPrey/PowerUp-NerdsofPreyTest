@@ -1,8 +1,7 @@
 package org.usfirst.frc.team4065.robot;
 import com.ctre.phoenix.motorcontrol.ControlMode;
-
+import edu.wpi.first.wpilibj.Timer;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 
@@ -73,12 +72,10 @@ public class TalonAutoDrive {
 		_TopL.set(ControlMode.PercentOutput, speed * -1);
 		_TopR.set(ControlMode.PercentOutput, speed * -1);
 	}
+
 	public void closeSolenoid(boolean close)
-		{
-
+	{
 		Solenoid.set(DoubleSolenoid.Value.kForward);
-
-
 	}
 	public void openSolenoid(boolean open)
 	{
@@ -89,5 +86,6 @@ public class TalonAutoDrive {
 	{
 		Solenoid.set(DoubleSolenoid.Value.kOff);
 	}
+
 
 }
