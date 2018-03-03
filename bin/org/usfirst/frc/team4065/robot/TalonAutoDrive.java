@@ -19,10 +19,10 @@ public class TalonAutoDrive {
 	private TalonSRX intakeR;
 
 
-	private DoubleSolenoid Solenoid;
+	private DoubleSolenoid solenoid;
 
 
-	public TalonAutoDrive(TalonSRX _TopL, TalonSRX _BtmL, TalonSRX _TopR, TalonSRX _BtmR, TalonSRX intakeL, TalonSRX intakeR) {
+	public TalonAutoDrive(TalonSRX _TopL, TalonSRX _BtmL, TalonSRX _TopR, TalonSRX _BtmR, TalonSRX intakeL, TalonSRX intakeR, DoubleSolenoid sol) {
 
 
 		this._TopL = _TopL;
@@ -40,6 +40,8 @@ public class TalonAutoDrive {
 		_BtmL.set(ControlMode.Follower, _TopL.getDeviceID());
 
 		_BtmR.set(ControlMode.Follower, _TopR.getDeviceID());
+
+		this.solenoid = sol;
 
 
 	}
@@ -73,18 +75,18 @@ public class TalonAutoDrive {
 		_TopR.set(ControlMode.PercentOutput, speed * -1);
 	}
 
-	public void closeSolenoid(boolean close)
+	public void closeSolenoid()//idk why you put boolean as arguments, you dont need it
 	{
-		Solenoid.set(DoubleSolenoid.Value.kForward);
+		solenoid.set(DoubleSolenoid.Value.kForward);
 	}
-	public void openSolenoid(boolean open)
+	public void openSolenoid()
 	{
-		Solenoid.set(DoubleSolenoid.Value.kReverse);
+		solenoid.set(DoubleSolenoid.Value.kReverse);
 
 	}
-	public void offSolenoid(boolean off)
+	public void offSolenoid()
 	{
-		Solenoid.set(DoubleSolenoid.Value.kOff);
+		solenoid.set(DoubleSolenoid.Value.kOff);
 	}
 
 

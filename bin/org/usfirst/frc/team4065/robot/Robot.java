@@ -59,11 +59,10 @@ private TalonSRX lift = new TalonSRX(32);
 
 private TalonSRX intakeL  = new TalonSRX(22);
 private TalonSRX intakeR  = new TalonSRX(23);
+private DoubleSolenoid solenoid = new DoubleSolenoid(4,5);
 
 //now your driveAuto should work
-public TalonAutoDrive driveAuto = new TalonAutoDrive(_TopL, _BtmL, _TopR, _BtmR, intakeL, intakeR);
-
-private DoubleSolenoid solenoid = new DoubleSolenoid(4,5);
+public TalonAutoDrive driveAuto = new TalonAutoDrive(_TopL, _BtmL, _TopR, _BtmR, intakeL, intakeR, solenoid);
 
 // L E D  L I G H T S
 //CANLight lights;
@@ -164,7 +163,7 @@ int Target = 0;
 		//it contains 3 letters, each letter is either L for our color being on the left side when facing it or R if it will be on the right side when facing from DS side.
 		//we want only the switch color for our switch right in front of us for auto, so we need the first letter.
 
-		switch (autoSelected) {
+		switch (autoSelected) {//use mNavX.getAngle() to get angle of robot, and getEncoderDistanceInches(tal) to get the encoder distance in inches from encoder in tal.
 
 		case leftAuto:
 
@@ -174,20 +173,30 @@ int Target = 0;
 			  		if(gameData.charAt(0) == 'L')
 			  		{
 				  			driveAuto.drive(0.3);//drives straight
-				  			Timer.delay(7);
+								double endDistanceL = getEncoderDistanceInches(_TopL) + 60;//we want the robot to drive forward 60 inches, so we only need to measure the change in distance, not absolute distance traveled of the shaft.
+								//so, the end distance will be the 60 inches plus the current distance the encoder is reading. so then it will move to current distance to current distance + 60
+								double endDistanceR = getEncoderDistanceInches(_TopR) + 60;
+				  			while(getEncoderDistanceInches(_TopL) < endDistanceL && getEncoderDistanceInches(_TopR) < endDistanceR)
+								{
+									//if you have trouble with the robot not driving straight, you can add an if statement that checks the difference in distance from both encoders. if it gets too big you can slow down one side and speed up the other to keep it straight.
+								}
 						  	driveAuto.drive(0.0);//stop drive
-						  	driveAuto.closeSolenoid(true);//clamp the cube
+						  	driveAuto.closeSolenoid();//clamp the cube
 						  	Timer.delay(0.3);
 						  	driveAuto.intake(0.3);//suck the cube
 						  	Timer.delay(1);
 						  	driveAuto.intake(0.0);//stops sucking the cube
-						  	driveAuto.closeSolenoid(false);//turn off air
-						  	driveAuto.offSolenoid(true);//make sure air is off
+						  	driveAuto.closeSolenoid();//turn off air
+						  	driveAuto.offSolenoid();//make sure air is off
 						  	driveAuto.turnR(0.3);//turns right
-						  	Timer.delay(1);
+								int endAngle = mNavX.getAngle() + 90;//need to make sure turning right increases angle, if it decreases angle then you need to subtract 90
+						  	while(mNavX.getAngle() < endAngle)
+								{
+
+								}
 						  	driveAuto.turnR(0.0);//stops turning
 						  	driveAuto.lift(0.4);//arm moves up
-						  	Timer.delay(2);
+						  	Timer.delay(2);//if there is encoder on lift, use it to convert the position its at to an angle. do something like getSelectedSensorPosition(0) * (360/4096) should give the angle its at. then use a while loop
 						  	driveAuto.lift(0.0);//stops lift
 						  	Timer.delay(0.1);
 						  	driveAuto.drive(0.2);//DRIVE TO THE scale a little
@@ -199,16 +208,23 @@ int Target = 0;
 			  		}
 						else if(gameData.charAt(0) == 'R') { // right
 
-				  		driveAuto.drive(0.5);
-				  		Timer.delay(7);
-				  		driveAuto.drive(0.0);
+							driveAuto.drive(0.3);//drives straight
+							double endDistanceL = getEncoderDistanceInches(_TopL) + 80;
+							double endDistanceR = getEncoderDistanceInches(_TopR) + 80;
+							while(getEncoderDistanceInches(_TopL) < endDistanceL && getEncoderDistanceInches(_TopR) < endDistanceR)
+							{
+								//if you have trouble with the robot not driving straight, you can add an if statement that checks the difference in distance from both encoders. if it gets too big you can slow down one side and speed up the other to keep it straight.
+							}
+							driveAuto.drive(0);
 			  	}
 				break;
-}
-			case centerAuto:
+			}
 
-				  if(gameData.length() > 0)
-	             {
+		case centerAuto:
+
+			if(gameData.length() > 0)
+	    {
+
 			  if(gameData.charAt(0) == 'L')
 			  {
 					driveAuto.drive(0.3);//drive
@@ -248,7 +264,9 @@ int Target = 0;
 
 				  	driveAuto.drive(-0.3);//drive backwards to be ready for the match
 
-			 } else if(gameData.charAt(0) == 'R') {
+			 }
+			 else if(gameData.charAt(0) == 'R')
+			 {
 
 				 driveAuto.drive(0.3);//drive
 					Timer.delay(2);
@@ -287,10 +305,11 @@ int Target = 0;
 				  	driveAuto.drive(-0.3);//drive backwards to be ready for the match
 					}
 				break;
-	              }
+	    }
+
 			case rightAuto:
 				   if(gameData.length() > 0)
-	               {
+	         {
 					   if(gameData.charAt(0) == 'L')
 			  {
 				   	driveAuto.drive(0.5);
